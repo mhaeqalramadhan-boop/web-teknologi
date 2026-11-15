@@ -1,6 +1,6 @@
 'use server';
 
-import { signIn } from '@/auth';
+import { signIn, signOut } from '@/auth';
 import { AuthError } from 'next-auth';
 
 export async function authenticate(
@@ -8,7 +8,10 @@ export async function authenticate(
   formData: FormData,
 ) {
   try {
-    await signIn('credentials', formData);
+    await signIn('credentials', {
+      ...Object.fromEntries(formData),
+      redirectTo: '/dashboard',
+    });
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
@@ -20,4 +23,8 @@ export async function authenticate(
     }
     throw error;
   }
+}
+
+export async function logout() {
+  await signOut({ redirectTo: '/login' });
 }
